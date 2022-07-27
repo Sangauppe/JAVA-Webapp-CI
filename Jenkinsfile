@@ -185,43 +185,43 @@ pipeline {
           }
         } 
 
-//         stage('Connection to cluster'){
-// 	    when {
-//               expression { params.action == 'create' }
-//           }
-//             steps{
-//                 sh """
-//                 aws configure set aws_access_key_id "$ACCESS_KEY"
-//                 aws configure set aws_secret_access_key "$SECRET_KEY"
-//                 aws configure set region "${params.region}"
+        stage('Connection to cluster'){
+	    when {
+              expression { params.action == 'create' }
+          }
+            steps{
+                sh """
+                aws configure set aws_access_key_id "$ACCESS_KEY"
+                aws configure set aws_secret_access_key "$SECRET_KEY"
+                aws configure set region "${params.region}"
                 
-//                 aws eks update-kubeconfig --name ${params.cluster} --region ${params.region}
+                aws eks update-kubeconfig --name ${params.cluster} --region ${params.region}
                 
-//                  """
-//             }
-//         } 
-//         stage('Deployment on Eks Cluster'){
-//              when {
-//               expression { params.action == 'create' }
-//           }
-//              steps{
-//                 sh """
-//                  cd kubefiles/
-//                   kubectl apply -f .
-//                  """
-//                  }
-//         }
-//         stage('Delete Deployment on Eks Cluster'){
-//              when {
-//               expression { params.action == 'destroy' }
-//              }
-//              steps{
-//                 sh """
-//                   cd kubefiles/
-//                   kubectl delete -f .
-//                   """
-//              }
-//         }     
+                 """
+            }
+        } 
+        stage('Deployment on Eks Cluster'){
+             when {
+              expression { params.action == 'create' }
+          }
+             steps{
+                sh """
+                 cd kubefiles/
+                  kubectl apply -f .
+                 """
+                 }
+        }
+        stage('Delete Deployment on Eks Cluster'){
+             when {
+              expression { params.action == 'destroy' }
+             }
+             steps{
+                sh """
+                  cd kubefiles/
+                  kubectl delete -f .
+                  """
+             }
+        }     
      }
  }
 
