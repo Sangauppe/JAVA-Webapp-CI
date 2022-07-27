@@ -1,0 +1,166 @@
+Parameters:
+  EKSClusterName:
+    Type: String
+    Description: Name of k8s cluster
+    Default: eks-cluster
+  NumWorkerNodes:
+    Type: Number
+    Description: Number of worker nodes to create
+    Default: 2
+  WorkerNodesInstanceType:
+    Type: String
+    Description: EC2 instance type for the worker nodes
+    Default: t3.medium  
+  KeyPairName:
+    Type: String
+    Description: Name of an existing EC2 key pair (for SSH-access to the worker node instances)
+    Default: jumpbox  
+  MyVPC:
+    Description: ID of the public subnet
+    Type: String
+    Default: vpcsubnet
+  PublicSubnets:
+    Description: ID of the public subnet
+    Type: String
+    Default: vpcsubnet
+  PrivateSubnets:
+    Description: ID of the public subnet
+    Type: String
+    Default: vpcsubnet
+
+  # IDs of the "EKS-optimised AMIs" for the worker nodes:
+  # https://docs.aws.amazon.com/eks/latest/userguide/eks-optimized-ami.html
+  # IMPORTANT NOTE: Choose AWS EKS compatible ami IDs only
+  # EksAmiIds:    
+  #   us-east-1:
+  #     Standard: ami-0729e439b6769d6ab
+  #============================================================================#
+  # Control plane
+  #============================================================================#
+Resources:
+  eksCluster:
+    Type: AWS::EKS::Cluster
+    Properties:
+      Name: EKS
+      Version: 1.22
+      RoleArn:
+        "Fn::GetAtt": ["eksIAMRole", "Arn"]
+      ResourcesVpcConfig:
+        SecurityGroupIds:
+        - !GetAtt ControlPlaneSecurityGroup.GroupId
+        SubnetIds:
+              - Fn::ImportValue:
+                  !Sub '${PublicSubnets}-PublicSubnet1ID'
+              - Fn::ImportValue:
+                  !Sub '${PublicSubnets}-PublicSubnet2ID'
+    DependsOn: [eksIAMRole, ControlPlaneSecurityGroup]
+
+  eksIAMRole:
+      Type: AWS::IAM::Role
+      Properties:
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                - eks.amazonaws.com
+              Action:
+              - 'sts:AssumeRole'
+        RoleName: EKSClusterRole
+        ManagedPolicyArns:
+          - arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
+          - arn:aws:iam::aws:policy/AmazonEKSServicePolicy
+       
+  #============================================================================#
+  # Control plane security group
+  #============================================================================#
+
+  ControlPlaneSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Cluster communication with worker nodes
+      VpcId: 
+         !ImportValue 
+            'Fn::Sub': '${MyVPC}-VPC'
+      Tags:
+        - Key: Name
+          Value: eks-SecurityGroup
+        - Key: Project
+          Value: aws-eks
+  
+  #============================================================================#
+  # EKS NODE group role
+  #============================================================================#
+
+  eksNodeInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
+        - "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
+        - "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+      Path: /
+
+  #============================================================================#
+  # EKS NODE GROUP
+  #============================================================================#
+
+  eksNodeGroup:
+    Type: AWS::EKS::Nodegroup
+    Properties:
+      ClusterName: EKS
+      NodeRole: 
+        "Fn::GetAtt": ["eksNodeInstanceRole", "Arn"]
+      AmiType: AL2_x86_64
+      InstanceTypes: 
+        - t3.medium
+      NodegroupName: NodeGroup01
+      RemoteAccess:
+        Ec2SshKey: jumpbox
+      ScalingConfig:
+        MinSize: 1
+        DesiredSize: 2
+        MaxSize: 4
+      Labels:
+        Project: aws-eks
+      Subnets:
+          - Fn::ImportValue:
+              !Sub '${PrivateSubnets}-PrivateSubnet1ID'
+          - Fn::ImportValue:
+              !Sub '${PrivateSubnets}-PrivateSubnet2ID'
+    DependsOn: [eksCluster, eksNodeInstanceRole]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    ## aws cloudformation create-stack --stack-name $EKS_STACK_NAME \
+  --region $EKS_AWS_REGION \
+  --template-body cicdtemp.yaml  \
+  --capabilities CAPABILITY_NAMED_IAM
