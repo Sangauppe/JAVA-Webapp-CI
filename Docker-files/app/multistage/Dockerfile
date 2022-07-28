@@ -1,13 +1,9 @@
-FROM openjdk:8 AS BUILD_IMAGE
-RUN apt update && apt install maven -y
-RUN git clone -b main https://github.com/vikash-kumar01/JAVA-Webapp-CI.git
-RUN cd JAVA-Webapp-CI && mvn install
-
 FROM tomcat:8-jre11
 
 RUN rm -rf /usr/local/tomcat/webapps/*
 
-COPY --from=BUILD_IMAGE JAVA-Webapp-CI/target/vprofile-v2.war /usr/local/tomcat/webapps/ROOT.war
+COPY  /var/lib/jenkins/workspace/complete_app_deployment-CI/taget/vprofile-v2.war /usr/local/tomcat/webapps/ROOT.war
 
 EXPOSE 8080
+
 CMD ["catalina.sh", "run"]
