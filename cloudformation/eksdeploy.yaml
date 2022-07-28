@@ -6,6 +6,5 @@ Parameters:
 Resources:
   ekscluster:
     Type: AWS::CloudFormation::Stack
-    DependsOn: VPCSubnet
     Properties:
       TemplateURL: https://vpro-cicd-templates.s3.amazonaws.com/stack-template/eks_cluster.yml
