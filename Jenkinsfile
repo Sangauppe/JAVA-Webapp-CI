@@ -2,11 +2,6 @@ pipeline {
 
     agent any
 
-    parameters{
-        choice(name: 'action', choices: 'create\ndestroy', description: 'Create/update or destroy the Deployment & SVC.')
-        string(name: 'cluster', defaultValue : 'EKS', description: "EKS cluster name.")
-        string(name: 'region', defaultValue : 'us-east-1', description: "AWS region.")
-    }
     environment {
         NEXUS_VERSION = "nexus3"
         NEXUS_PROTOCOL = "http"
@@ -28,28 +23,21 @@ pipeline {
 	    }
 
         stage('UNIT TEST'){
-	     when {
-              expression { params.action == 'create' }
-          }
+
             steps {
                 sh 'mvn test'
             }
         }
 
         stage('INTEGRATION TEST'){
-	     when {
-              expression { params.action == 'create' }
-           }
+
             steps {
                 sh 'mvn verify -DskipUnitTests'
             }
         }
 
         stage('CODE ANALYSIS with SONARQUBE') {
-	    when {
-              expression { params.action == 'create' }
-           }
-
+	
             environment {
                 scannerHome = tool 'mysonarscanner4'
             }
@@ -73,9 +61,7 @@ pipeline {
         }
 	   
         stage('BUILD'){
-	     when {
-              expression { params.action == 'create' }
-          }
+
             steps {
                 sh 'mvn clean install -DskipTests'
             }
@@ -96,9 +82,7 @@ pipeline {
 	    }
 
         stage ('CODE ANALYSIS WITH CHECKSTYLE'){
-	     when {
-              expression { params.action == 'create' }
-            }
+
             steps {
                 sh 'mvn checkstyle:checkstyle'
             }
@@ -111,9 +95,7 @@ pipeline {
 
 
         stage("Publish to Nexus Repository Manager") {
-	     when {
-              expression { params.action == 'create' }
-           }
+
             steps {
                 script {
                     pom = readMavenPom file: "pom.xml";
@@ -150,9 +132,7 @@ pipeline {
             }
         }
         stage('Docker : App Image Building'){
-	     when {
-              expression { params.action == 'create' }
-          }
+
             steps{
                 sh """
                 cd Docker-files/app/multistage/
@@ -163,9 +143,7 @@ pipeline {
         }
 
         stage('Docker : Image push to DockerHUB '){
-	     when {
-              expression { params.action == 'create' }
-          }
+
             steps{
                 
                 withCredentials([string(credentialsId: 'dockerHub_passwd', variable: 'docker_cred')]) {
