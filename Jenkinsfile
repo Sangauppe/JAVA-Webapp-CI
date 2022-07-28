@@ -36,7 +36,26 @@ pipeline {
                 sh 'mvn verify -DskipUnitTests'
             }
         }
+	stage ('CODE ANALYSIS WITH CHECKSTYLE'){
 
+            steps {
+                sh 'mvn checkstyle:checkstyle'
+            }
+            post {
+                success {
+                    echo 'Generated Analysis Result'
+                }
+            }
+        }
+	    
+ 	stage('OWASP CHECK'){
+		steps{
+
+	        dependencyCheck additionalArguments: '--format JSON  --disableYarnAudit', odcInstallation: 'owasp-check'
+                recordIssues(tools: [checkStyle(id: 'CheckStyle-Issues', pattern: 'target/checkstyle-result.xml'), owaspDependencyCheck(id: 'OWASP-issues', pattern: 'dependency-check-report.json')])
+		}    
+	    }
+	    
         stage('CODE ANALYSIS with SONARQUBE') {
 	
             environment {
@@ -74,26 +93,6 @@ pipeline {
             }
         }
 	    
-	stage('OWASP CHECK'){
-		steps{
-
-	        dependencyCheck additionalArguments: '--format JSON  --disableYarnAudit', odcInstallation: 'owasp-check'
-                recordIssues(tools: [checkStyle(id: 'CheckStyle-Issues', pattern: 'target/checkstyle-result.xml'), owaspDependencyCheck(id: 'OWASP-issues', pattern: 'dependency-check-report.json')])
-		}    
-	    }
-
-        stage ('CODE ANALYSIS WITH CHECKSTYLE'){
-
-            steps {
-                sh 'mvn checkstyle:checkstyle'
-            }
-            post {
-                success {
-                    echo 'Generated Analysis Result'
-                }
-            }
-        }
-
 
         stage("Publish to Nexus Repository Manager") {
 
