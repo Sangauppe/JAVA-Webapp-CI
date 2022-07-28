@@ -24,3 +24,6 @@ Then look for the file :
 
 
 # JAVA-Webapp-CI
+
+    ![image](https://user-images.githubusercontent.com/35370115/181448060-74edc68d-00ba-4441-873e-fb9ecb8fafa6.png)
+
