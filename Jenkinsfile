@@ -137,6 +137,8 @@ pipeline {
             steps{
                 sh """
 		pwd
+		ls 
+		t*
 		echo $WORKSPACE
 		cp ./target/*.war ./Docker-files/app/multistage/
                 cd Docker-files/app/multistage/
