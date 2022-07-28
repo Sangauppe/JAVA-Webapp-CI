@@ -136,7 +136,9 @@ pipeline {
               //cd scripts && chmod +x docker.sh && ./docker.sh
             steps{
                 sh """
-		cp target/*.war ./Docker-files/app/multistage/
+		pwd
+		echo $WORKSPACE
+		cp ./target/*.war ./Docker-files/app/multistage/
                 cd Docker-files/app/multistage/
                 docker build -t vikashashoke/vprofileapp:v1.$BUILD_ID . 
                 docker image tag vikashashoke/vprofileapp:v1.$BUILD_ID vikashashoke/vprofileapp:latest 
