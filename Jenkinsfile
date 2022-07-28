@@ -6,6 +6,7 @@ pipeline {
         NEXUS_VERSION = "nexus3"
         NEXUS_PROTOCOL = "http"
         NEXUS_URL = "10.0.0.145:8081"
+	NEXUSPORT=8081
         NEXUS_REPOSITORY = "vprofile-release"
 	NEXUS_REPOGRP_ID    = "vpro-maven-group"
         NEXUS_CREDENTIAL_ID = "nexus_login"
@@ -137,8 +138,8 @@ pipeline {
                 sh """
 		
                 cd Docker-files/app/multistage/
-                docker build -t vikashashoke/vprofileapp:v1.$BUILD_ID .
-                docker image tag vikashashoke/vprofileapp:v1.$BUILD_ID vikashashoke/vprofileapp:latest
+                docker build -t vikashashoke/vprofileapp:v1.$BUILD_ID .  -var 'NEXUSPORT=$NEXUSPORT'
+                docker image tag vikashashoke/vprofileapp:v1.$BUILD_ID vikashashoke/vprofileapp:latest 
                 """
             }
         }
