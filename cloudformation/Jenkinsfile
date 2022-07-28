@@ -16,21 +16,21 @@ pipeline {
 	    
 	    stage('Git CheckOut'){
 		    steps{
-		       checkout([$class: 'GitSCM', branches: [[name: '*/main']], extensions: [[$class: 'WipeWorkspace']], userRemoteConfigs: [[url: 'https://github.com/vikash-kumar01/myVprofile_Project.git']]])
+		       checkout([$class: 'GitSCM', branches: [[name: '*/main']], extensions: [[$class: 'WipeWorkspace']], userRemoteConfigs: [[url: 'https://github.com/vikash-kumar01/JAVA-Webapp-CI.git']]])
 		    }
 	    }
 	    
-// 	    stage('EKS Cluster Creation'){
-// 		    steps{
-// 		        sh """
-// 			aws configure set aws_access_key_id "$ACCESS_KEY"
-//                         aws configure set aws_secret_access_key "$SECRET_KEY"
+	    stage('EKS Cluster Creation'){
+		    steps{
+		        sh """
+	    	aws configure set aws_access_key_id "$ACCESS_KEY"
+            aws configure set aws_secret_access_key "$SECRET_KEY"
 			
-// 			cd cloudformation
-// 			aws cloudformation create-stack --stack-name eks --template-body file://eksdeploy.yml --capabilities CAPABILITY_NAMED_IAM
-// 			"""
-// 		    }
-// 	    }
+			cd cloudformation
+			aws cloudformation create-stack --stack-name eks --template-body file://eksdeploy.yaml --capabilities CAPABILITY_NAMED_IAM
+			"""
+		    }
+	    }
 	    
 	  stage('Connection to cluster'){
 	    when {
