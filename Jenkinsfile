@@ -4,7 +4,7 @@ pipeline {
 
     parameters{
         choice(name: 'action', choices: 'create\ndestroy', description: 'Create/update or destroy the Deployment & SVC.')
-        string(name: 'cluster', defaultValue : 'democluster', description: "EKS cluster name.")
+        string(name: 'cluster', defaultValue : 'EKS', description: "EKS cluster name.")
         string(name: 'region', defaultValue : 'us-east-1', description: "AWS region.")
     }
     environment {
