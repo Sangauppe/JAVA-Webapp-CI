@@ -1,0 +1,11 @@
+Parameters:
+  KeyPair:
+    Description: Amazon EC2 Key Pair
+    Type: "AWS::EC2::KeyPair::KeyName"
+    Default: jumpbox
+Resources:
+  ekscluster:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: VPCSubnet
+    Properties:
+      TemplateURL: https://vpro-cicd-templates.s3.amazonaws.com/stack-template/eks_cluster.yml
