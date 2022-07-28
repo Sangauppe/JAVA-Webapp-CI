@@ -1,7 +1,7 @@
 FROM openjdk:8 AS BUILD_IMAGE
 RUN apt update && apt install maven -y
 RUN git clone -b main https://github.com/vikash-kumar01/JAVA-Webapp-CI.git
-RUN cd myVprofile_Project && mvn install
+RUN cd JAVA-Webapp-CI && mvn install
 
 FROM tomcat:8-jre11
 
