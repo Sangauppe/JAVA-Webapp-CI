@@ -3,7 +3,7 @@ pipeline {
     agent any
 
     parameters{
-        choice(name: 'action', choices: 'create\ndestroy', description: 'Create/update or destroy the Deployment & SVC.')
+        choice(name: 'action', choices: 'create\ndestroy\ndestroyekscluster', description: 'Create/update or destroy the Deployment & SVC.')
         string(name: 'cluster', defaultValue : 'EKS', description: "EKS cluster name.")
         string(name: 'region', defaultValue : 'us-east-1', description: "AWS region.")
     }
@@ -27,7 +27,7 @@ pipeline {
                         aws configure set aws_secret_access_key "$SECRET_KEY"
 			
 			cd cloudformation
-			aws cloudformation create-stack --stack-name eks1 --template-body file://eksdeploy.yml --capabilities CAPABILITY_NAMED_IAM
+			aws cloudformation create-stack --stack-name eks --template-body file://eksdeploy.yml --capabilities CAPABILITY_NAMED_IAM
 			"""
 		    }
 	    }
@@ -66,6 +66,21 @@ pipeline {
                 sh """
                   cd kubefiles/
                   kubectl delete -f .
+		  aws cloudformation delete-stack --stack-name eks
+                  """
+             }
+        }
+        stage('Delete Eks Cluster'){
+             when {
+              expression { params.action == 'ndestroyekscluster' }
+             }
+             steps{
+                sh """
+		aws configure set aws_access_key_id "$ACCESS_KEY"
+                aws configure set aws_secret_access_key "$SECRET_KEY"
+                aws configure set region "${params.region}"
+		
+	        aws cloudformation delete-stack --stack-name eks
                   """
              }
         } 
