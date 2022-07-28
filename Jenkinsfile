@@ -132,10 +132,10 @@ pipeline {
             }
         }
         stage('Docker : App Image Building'){
-
+              //cd scripts && chmod +x docker.sh && ./docker.sh
             steps{
                 sh """
-		cd scripts && chmod +x docker.sh && ./docker.sh
+		
                 cd Docker-files/app/multistage/
                 docker build -t vikashashoke/vprofileapp:v1.$BUILD_ID .
                 docker image tag vikashashoke/vprofileapp:v1.$BUILD_ID vikashashoke/vprofileapp:latest
