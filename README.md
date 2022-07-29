@@ -29,7 +29,7 @@ Then look for the file :
 
 # JAVA-Webapp-CD
 
-![image](https://user-images.githubusercontent.com/35370115/181759428-219d7260-30bc-4166-887f-e594230dd205.png)
+![image](https://user-images.githubusercontent.com/35370115/181778556-6e0bb7ca-11a7-480d-a3b5-52f3d1428317.png)
 
 
 
