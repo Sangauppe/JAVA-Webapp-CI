@@ -5,7 +5,7 @@ pipeline {
     environment {
         NEXUS_VERSION = "nexus3"
         NEXUS_PROTOCOL = "http"
-        NEXUS_URL = "10.0.0.145:8081"
+        NEXUS_URL = "10.0.0.62:8081"
 	NEXUSPORT=8081
         NEXUS_REPOSITORY = "vprofile-release"
 	NEXUS_REPOGRP_ID    = "vpro-maven-group"
