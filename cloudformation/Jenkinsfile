@@ -27,7 +27,7 @@ pipeline {
             aws configure set aws_secret_access_key "$SECRET_KEY"
 			
 			cd cloudformation
-			aws cloudformation create-stack --stack-name eks --template-body file://eksdeploy.yaml --capabilities CAPABILITY_NAMED_IAM
+			aws cloudformation create-stack --stack-name eksdeploy --template-body file://eksdeploy.yaml --capabilities CAPABILITY_NAMED_IAM
 			"""
 		    }
 	    }
