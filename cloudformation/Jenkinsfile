@@ -3,7 +3,7 @@ pipeline {
     agent any
 
     parameters{
-        choice(name: 'action', choices: 'create\ndestroy\ndestroyekscluster', description: 'Create/update or destroy the Deployment & SVC.')
+        choice(name: 'action', choices: 'create\ndestroy\ndestroyekscluster', description: 'Create/update or destroy the Deployment or Eks Cluster.')
         string(name: 'cluster', defaultValue : 'EKS', description: "EKS cluster name.")
         string(name: 'region', defaultValue : 'us-east-1', description: "AWS region.")
     }
@@ -22,9 +22,9 @@ pipeline {
 	    
 	    stage('EKS Cluster Creation'){
 		    steps{
-		        sh """
+		    sh """
 	    	aws configure set aws_access_key_id "$ACCESS_KEY"
-            aws configure set aws_secret_access_key "$SECRET_KEY"
+                aws configure set aws_secret_access_key "$SECRET_KEY"
 			
 			cd cloudformation
 			aws cloudformation create-stack --stack-name eks --template-body file://eksdeploy.yaml --capabilities CAPABILITY_NAMED_IAM
@@ -37,14 +37,26 @@ pipeline {
               expression { params.action == 'create' }
           }
             steps{
-                sh """
-                aws configure set aws_access_key_id "$ACCESS_KEY"
-                aws configure set aws_secret_access_key "$SECRET_KEY"
-                aws configure set region "${params.region}"
-                
-                aws eks update-kubeconfig --name ${params.cluster} --region ${params.region}
-                
-                 """
+
+             script{
+                    def apply = false
+                    try {
+                        input message: 'Can you please confirm the apply once eks cluster deployed', ok: 'Ready to Apply the Config'
+                        apply = true
+                    } catch (err) {
+                        apply = false
+                         currentBuild.result = 'UNSTABLE'
+                    }
+                    if(apply){
+                            sh """
+                            aws configure set aws_access_key_id "$ACCESS_KEY"
+                            aws configure set aws_secret_access_key "$SECRET_KEY"
+                            aws configure set region "${params.region}"
+                            
+                            aws eks update-kubeconfig --name ${params.cluster} --region ${params.region}
+                            """
+                        }
+                }
             }
         } 
         stage('Deployment on Eks Cluster'){
@@ -58,31 +70,43 @@ pipeline {
                  """
                  }
         }
-        stage('Delete Deployment on Eks Cluster'){
+        stage('Delete Deployments on Eks Cluster'){
              when {
               expression { params.action == 'destroy' }
              }
              steps{
-                sh """
-                  cd kubefiles/
-                  kubectl delete -f .
-		  aws cloudformation delete-stack --stack-name eks
-                  """
-             }
-        }
-        stage('Delete Eks Cluster'){
-             when {
-              expression { params.action == 'ndestroyekscluster' }
-             }
-             steps{
-                sh """
-		aws configure set aws_access_key_id "$ACCESS_KEY"
-                aws configure set aws_secret_access_key "$SECRET_KEY"
-                aws configure set region "${params.region}"
-		
-	        aws cloudformation delete-stack --stack-name eks
-                  """
-             }
+
+            def destroy = false
+                    try {
+                        input message: 'Can you please confirm the destroy ?', ok: 'Ready to Apply the Config'
+                        destroy = true
+                    } catch (err) {
+                        destroy = false
+                         currentBuild.result = 'UNSTABLE'
+                    }
+                    if(destroy){
+                                sh """
+                                cd kubefiles/
+                                kubectl delete -f .
+                                aws cloudformation delete-stack --stack-name eks
+                                """
+                        }
+                }
+
+           }
+                stage('Delete Eks Cluster'){
+                    when {
+                    expression { params.action == 'destroyekscluster' }
+                    }
+                    steps{
+                        sh """
+                aws configure set aws_access_key_id "$ACCESS_KEY"
+                        aws configure set aws_secret_access_key "$SECRET_KEY"
+                        aws configure set region "${params.region}"
+                
+                    aws cloudformation delete-stack --stack-name eks
+                        """
+                    }
+                }
         } 
     }
-}
