@@ -24,7 +24,7 @@ pipeline {
 		    steps{
 		    sh """
 	    	aws configure set aws_access_key_id "$ACCESS_KEY"
-                aws configure set aws_secret_access_key "$SECRET_KEY"
+            aws configure set aws_secret_access_key "$SECRET_KEY"
 			
 			cd cloudformation
 			aws cloudformation create-stack --stack-name eks --template-body file://eksdeploy.yaml --capabilities CAPABILITY_NAMED_IAM
@@ -75,7 +75,7 @@ pipeline {
               expression { params.action == 'destroy' }
              }
              steps{
-
+         script{
             def destroy = false
                     try {
                         input message: 'Can you please confirm the destroy ?', ok: 'Ready to Apply the Config'
@@ -91,6 +91,7 @@ pipeline {
                                 aws cloudformation delete-stack --stack-name eks
                                 """
                         }
+                  }
                 }
 
            }
