@@ -14,7 +14,7 @@ pipeline {
 
     stages{
 	    
-	    stage('Git CheckOut'){
+	    stage('Workspace CleanUP'){
 		    steps{
 		       checkout([$class: 'GitSCM', branches: [[name: '*/main']], extensions: [[$class: 'WipeWorkspace']], userRemoteConfigs: [[url: 'https://github.com/vikash-kumar01/JAVA-Webapp-CI.git']]])
 		    }
