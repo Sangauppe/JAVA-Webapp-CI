@@ -29,7 +29,7 @@ Then look for the file :
 
 # JAVA-Webapp-CD
 
-![image](https://user-images.githubusercontent.com/35370115/181778556-6e0bb7ca-11a7-480d-a3b5-52f3d1428317.png)
+![image](https://user-images.githubusercontent.com/35370115/183072204-3e4b0955-8a91-4f0e-bb91-da3988b00e12.png)
 
 
 # If SonarQube Code Coverage is < 7% 
