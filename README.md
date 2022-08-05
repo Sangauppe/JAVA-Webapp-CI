@@ -38,4 +38,7 @@ Then look for the file :
 
 ![image](https://user-images.githubusercontent.com/35370115/183018312-5b4269fc-7bf4-43f2-99dc-12308d50d4c2.png)
 
+# If code Coverage < 6
+
+![image](https://user-images.githubusercontent.com/35370115/183019078-a2ea3fd4-2f48-4844-bb1f-bb93e97773d0.png)
 
