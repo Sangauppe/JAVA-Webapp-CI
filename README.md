@@ -32,4 +32,10 @@ Then look for the file :
 ![image](https://user-images.githubusercontent.com/35370115/181778556-6e0bb7ca-11a7-480d-a3b5-52f3d1428317.png)
 
 
+# If SonarQube Code Coverage id less that 7% 
+
+![image](https://user-images.githubusercontent.com/35370115/183018244-b2e1f0ce-c35c-4758-ab44-998d80674a81.png)
+
+![image](https://user-images.githubusercontent.com/35370115/183018312-5b4269fc-7bf4-43f2-99dc-12308d50d4c2.png)
+
 
