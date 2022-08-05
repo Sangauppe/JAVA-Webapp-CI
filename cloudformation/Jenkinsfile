@@ -33,21 +33,8 @@ pipeline {
 // 	    }
 	    
 	  stage('Connection to cluster'){
-	    when {
-              expression { params.action == 'create' }
-          }
+	    when { expression { params.action == 'create' } }
             steps{
-
-             script{
-                    def apply = false
-                    try {
-                        input message: 'Can you please confirm the apply once eks cluster deployed', ok: 'Ready to Apply the Config'
-                        apply = true
-                    } catch (err) {
-                        apply = false
-                         currentBuild.result = 'UNSTABLE'
-                    }
-                    if(apply){
                             sh """
                             aws configure set aws_access_key_id "$ACCESS_KEY"
                             aws configure set aws_secret_access_key "$SECRET_KEY"
@@ -55,8 +42,6 @@ pipeline {
                             
                             aws eks update-kubeconfig --name ${params.cluster} --region ${params.region}
                             """
-                        }
-                }
             }
         } 
         stage('Deployment on Eks Cluster'){
@@ -64,12 +49,26 @@ pipeline {
               expression { params.action == 'create' }
           }
              steps{
-                sh """
-                 cd kubefiles/
-                  kubectl apply -f .
-                 """
-                 }
+		 script{
+                    def apply = false
+                    try {
+                        input message: 'please confirm the apply to initiate the deployment', ok: 'Ready to Apply the Config'
+                        apply = true
+                    } catch (err) {
+                        apply = false
+                         currentBuild.result = 'UNSTABLE'
+                    }
+                    if(apply){
+				sh """
+				 cd kubefiles/
+				  kubectl apply -f .
+				 """
+                   }
+               }
+            }
+	  }	
         }
+	
         stage('Delete Deployments on Eks Cluster'){
              when {
               expression { params.action == 'destroy' }
