@@ -34,35 +34,6 @@
 #             persistentVolumeClaim:
 #               claimName: myebsvolclaim
 
-# apiVersion: apps/v1
-# kind: Deployment
-# metadata:
-#   name: vprodb
-#   labels:
-#     app: vprodb
-# spec:
-#   replicas: 1
-#   selector:
-#     matchLabels:
-#       app: vprodb
-#   template:
-#      metadata:
-#        labels:
-#          app: vprodb
-#      spec:
-#         containers:
-#          - name: vprodb
-#            image: vikashashoke/vprofiledb:latest
-#            ports:
-#              - containerPort: 3306
-#                name: vprodb-port
-#            env:
-#              - name: MYSQL_ROOT_PASSWORD
-#                valueFrom:
-#                  secretKeyRef:
-#                     name: app-secret
-#                     key: db-pass
-                    
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -82,9 +53,6 @@ spec:
         containers:
          - name: vprodb
            image: vikashashoke/vprofiledb:latest
-           volumeMounts:
-             - name:  vpro-db-data
-               mountPath:  /avr/lib/mysql
            ports:
              - containerPort: 3306
                name: vprodb-port
@@ -94,13 +62,45 @@ spec:
                  secretKeyRef:
                     name: app-secret
                     key: db-pass
-        nodeSelector:
-          topology.kubernetes.io/zone: us-east-1a
-        volumes:
-          - name:  vpro-db-data
-            awsElasticBlockStore:
-              volumeID: vol-04efdd7e7efdc9bad
-              fsType: ext4
+                    
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: vprodb
+#   labels:
+#     app: vprodb
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: vprodb
+#   template:
+#      metadata:
+#        labels:
+#          app: vprodb
+#      spec:
+#         containers:
+#          - name: vprodb
+#            image: vikashashoke/vprofiledb:latest
+#            volumeMounts:
+#              - name:  vpro-db-data
+#                mountPath:  /avr/lib/mysql
+#            ports:
+#              - containerPort: 3306
+#                name: vprodb-port
+#            env:
+#              - name: MYSQL_ROOT_PASSWORD
+#                valueFrom:
+#                  secretKeyRef:
+#                     name: app-secret
+#                     key: db-pass
+#         nodeSelector:
+#           topology.kubernetes.io/zone: us-east-1a
+#         volumes:
+#           - name:  vpro-db-data
+#             awsElasticBlockStore:
+#               volumeID: vol-04efdd7e7efdc9bad
+#               fsType: ext4
 
 
 --- 
