@@ -45,9 +45,7 @@ pipeline {
             }
         } 
         stage('Deployment on Eks Cluster'){
-             when {
-              expression { params.action == 'create' }
-          }
+             when { expression { params.action == 'create' } }
              steps{
 		 script{
                     def apply = false
@@ -65,8 +63,7 @@ pipeline {
 				 """
                    }
                }
-            }
-	  }	
+            }	
         }
 	
         stage('Delete Deployments on Eks Cluster'){
