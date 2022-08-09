@@ -4,7 +4,50 @@ Parameters:
     Type: "AWS::EC2::KeyPair::KeyName"
     Default: jumpbox
 Resources:
-  ekscluster:
+  VPCSubnet:
     Type: AWS::CloudFormation::Stack
     Properties:
+      TemplateURL: https://vpro-cicd-templates.s3.amazonaws.com/stack-template/vpcsubnet.yaml
+
+  S3RoleforCiCd:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: VPCSubnet
+    Properties:
+      TemplateURL: https://vpro-cicd-templates.s3.amazonaws.com/stack-template/cicds3role.yaml
+
+  JenkinsInst:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: S3RoleforCiCd
+    Properties:
+      TemplateURL: https://vpro-cicd-templates.s3.amazonaws.com/stack-template/jenk.yaml
+      Parameters:
+        KeyName: !Ref KeyPair
+
+  NexusServer:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: JenkinsInst
+    Properties:
+      TemplateURL: https://vpro-cicd-templates.s3.amazonaws.com/stack-template/nexus.yaml
+      Parameters:
+        KeyName: !Ref KeyPair
+
+  SonarServer:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: JenkinsInst
+    Properties:
+      TemplateURL: https://vpro-cicd-templates.s3.amazonaws.com/stack-template/sonar.yaml
+      Parameters:
+        KeyName: !Ref KeyPair
+
+  ekscluster:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: VPCSubnet
+    Properties:
       TemplateURL: https://vpro-cicd-templates.s3.amazonaws.com/stack-template/eks_cluster.yml
+
+
+
+
+#aws cloudformation create-stack --stack-name eks --template-body file://cicdtemp.yml --capabilities CAPABILITY_NAMED_IAM
+#aws cloudformation delete-stack --stack-name eks
+
